@@ -11,7 +11,7 @@ import shutil
 from decimal import getcontext, Decimal
 from termcolor import *
 
-RATE_THRESHOLD=0 #1%
+RATE_THRESHOLD=10 #1%
 
 def compressDir(oriDir, outDir, result):
     if os.path.exists(outDir):
@@ -35,7 +35,7 @@ def compressFile(fileName, outDir, result):
     oriSize = os.path.getsize(fileName)
 
     outputName = ''.join([outDir, '/', os.path.basename(fileName)])
-    cmd = 'pngquant -o {outputName} --quality 50-50 {intputFile}'.format(intputFile=fileName,
+    cmd = 'pngquant -o {outputName} --speed 1 --quality 90-90 {intputFile}'.format(intputFile=fileName,
                                                                          outputName=outputName)
     os.system(cmd)
     compressSize = os.path.getsize(outputName)
@@ -46,6 +46,8 @@ def compressFile(fileName, outDir, result):
         printString = printString.format(fileName=os.path.basename(fileName), oriSize=oriSize,
                                          nowSize=compressSize, rate=rate)
     else:
+        #delete skip file
+        os.remove(outputName)
         printString = "".join([fileName, "  Skip ##~", str(rate), "%"])
 
     result.append(printString)
