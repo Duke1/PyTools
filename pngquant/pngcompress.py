@@ -11,7 +11,9 @@ import shutil
 from decimal import getcontext, Decimal
 from termcolor import *
 
-RATE_THRESHOLD=10 #1%
+RATE_THRESHOLD = 10  # 1%
+FILE_SIZE_THRESHOLD = 5 * 1000  # 5KB
+
 
 def compressDir(oriDir, outDir, result):
     if os.path.exists(outDir):
@@ -28,26 +30,32 @@ def compressDir(oriDir, outDir, result):
 
 
 def compressFile(fileName, outDir, result):
+    printString = ''
+    rate = -1
     fileNames = os.path.splitext(fileName)
     if 2 == len(fileNames) and not '.png' == fileNames[1]:
         return ""
 
     oriSize = os.path.getsize(fileName)
 
-    outputName = ''.join([outDir, '/', os.path.basename(fileName)])
-    cmd = 'pngquant -o {outputName} --speed 1 --quality 90-90 {intputFile}'.format(intputFile=fileName,
-                                                                         outputName=outputName)
-    os.system(cmd)
-    compressSize = os.path.getsize(outputName)
+    if oriSize > FILE_SIZE_THRESHOLD:
+        outputName = ''.join([outDir, '/', os.path.basename(fileName)])
+        cmd = 'pngquant -o {outputName} --speed 1 --quality 90-90 {intputFile}'.format(
+            intputFile=fileName,
+            outputName=outputName)
+        os.system(cmd)
+        compressSize = os.path.getsize(outputName)
 
-    rate = Decimal(float((oriSize - compressSize) / oriSize * 100)).quantize(Decimal('0.00'))
-    if rate > RATE_THRESHOLD:
-        printString = '{fileName} {oriSize}-->{nowSize}  [COMPRESSED]~{rate}%'
-        printString = printString.format(fileName=os.path.basename(fileName), oriSize=oriSize,
-                                         nowSize=compressSize, rate=rate)
-    else:
-        #delete skip file
-        os.remove(outputName)
+        rate = Decimal(float((oriSize - compressSize) / oriSize * 100)).quantize(Decimal('0.00'))
+        if rate > RATE_THRESHOLD:
+            printString = '{fileName} {oriSize}-->{nowSize}  [COMPRESSED]~{rate}%'
+            printString = printString.format(fileName=os.path.basename(fileName), oriSize=oriSize,
+                                             nowSize=compressSize, rate=rate)
+        else:
+            # delete skip file
+            os.remove(outputName)
+
+    if 0 == len(printString):
         printString = "".join([fileName, "  Skip ##~", str(rate), "%"])
 
     result.append(printString)
@@ -87,4 +95,4 @@ if __name__ == "__main__":
     main()
 
 
-#python3 pngcompress.py -s 路径
+    # python3 pngcompress.py -s 路径
