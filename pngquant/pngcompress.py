@@ -21,7 +21,7 @@ def compressDir(oriDir, outDir, result):
     os.makedirs(outDir)
 
     if not os.path.exists(oriDir):
-        print ('directory not found !!!')
+        print (oriDir + ' ---- directory not found !!!')
         return
     for file in os.listdir(oriDir):
         sourceFile = os.path.join(oriDir, file)
@@ -39,7 +39,7 @@ def compressFile(fileName, outDir, result):
     oriSize = os.path.getsize(fileName)
 
     if oriSize > FILE_SIZE_THRESHOLD:
-        outputName = ''.join([outDir, '/', os.path.basename(fileName)])
+        outputName = ''.join([outDir, '/', os.path.basename(fileName), ''])
         cmd = 'pngquant -o {outputName} --speed 1 --quality 90-90 {intputFile}'.format(
             intputFile=fileName,
             outputName=outputName)
