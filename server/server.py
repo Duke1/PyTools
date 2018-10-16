@@ -30,17 +30,25 @@ class GetHandler(http.server.SimpleHTTPRequestHandler):
         http.server.SimpleHTTPRequestHandler.do_GET(self)
 
 def openServer(ip):
+
     #http.server.SimpleHTTPRequestHandler
     Handler = GetHandler
 
+    socketserver.TCPServer.allow_reuse_address = True
     #ip
     httpd = socketserver.ThreadingTCPServer(('', PORT), Handler)
     socketserver.timeout = 60
     socketserver.request_queue_size = 200;
 
     print("serving at port ", PORT)
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        print ('中断')
+    finally:
+        print ('关闭服务')
+        httpd.server_close()
 
-    httpd.serve_forever()
 
 
 def find_all_ip(platform):
@@ -134,6 +142,9 @@ if __name__ == "__main__":
     if os.path.exists('./offical.apk'):
         for ip in ips:
             generateQRCode(ip, 'http://{host}:{port}/{filePath}'.format(host=ip, port=PORT,filePath='offical.apk'))
-            
+
     print ('\r\n生成二维码成功！！\r\n')
-    openServer(ips[0]);
+    openServer(ips[0])
+
+
+    #Address already in use --> lsof -i :8000
