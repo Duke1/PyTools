@@ -127,9 +127,13 @@ def generateQRCode(name, code_content, savepath=CUR_PATH, code_box_size=10, code
 if __name__ == "__main__":
     ips = find_all_ip(platform.system())
     print (ips)
-    for ip in ips:
-        generateQRCode(ip, 'http://{host}:{port}/{filePath}'.format(host=ip, port=PORT,
-                                                             filePath='offical.apk'));
-    print ('\r\n生成二维码成功！！\r\n')
+    if 0==len(ips):
+        inputIp = input('输入ip: ')
+        ips.append(inputIp)
 
+    if os.path.exists('./offical.apk'):
+        for ip in ips:
+            generateQRCode(ip, 'http://{host}:{port}/{filePath}'.format(host=ip, port=PORT,filePath='offical.apk'))
+            
+    print ('\r\n生成二维码成功！！\r\n')
     openServer(ips[0]);
